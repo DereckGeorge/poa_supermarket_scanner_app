@@ -22,23 +22,19 @@ class AuthProvider with ChangeNotifier {
     _setLoading(true);
 
     try {
-      // Initialize storage
-      await StorageService.init();
+      // Initialize API service
+      await ApiService.init();
 
-      // Check for saved token and user
-      final token = await StorageService.getToken();
-      final savedUser = StorageService.getUser();
-
-      if (token != null && savedUser != null) {
-        ApiService.setToken(token);
-
-        // Verify token is still valid
-        final isValid = await ApiService.isTokenValid();
-        if (isValid) {
-          _user = savedUser;
+      // Check if user is already logged in with valid token
+      final isLoggedIn = await ApiService.isLoggedIn();
+      if (isLoggedIn) {
+        // Try to get user data (this would require implementing a getUserProfile API call)
+        try {
+          // For now, just set authenticated to true
           _isAuthenticated = true;
-        } else {
-          // Token expired, clear data
+          // Note: You might want to add a getUserProfile API call here to get fresh user data
+        } catch (e) {
+          // If getting user data fails, clear auth
           await _clearAuthData();
         }
       }
@@ -59,10 +55,6 @@ class AuthProvider with ChangeNotifier {
       if (response['user'] != null && response['access_token'] != null) {
         _user = User.fromJson(response['user']);
         _isAuthenticated = true;
-
-        // Save to local storage
-        await StorageService.saveToken(response['access_token']);
-        await StorageService.saveUser(_user!);
 
         _setLoading(false);
         notifyListeners();
@@ -98,9 +90,15 @@ class AuthProvider with ChangeNotifier {
   Future<void> _clearAuthData() async {
     _user = null;
     _isAuthenticated = false;
-    ApiService.clearToken();
-    await StorageService.clearAllData();
+    await StorageService.clearAuthData();
     notifyListeners();
+  }
+
+  // Call this method on user activity to refresh session
+  Future<void> refreshSession() async {
+    if (_isAuthenticated) {
+      await ApiService.refreshSession();
+    }
   }
 
   void _setLoading(bool loading) {

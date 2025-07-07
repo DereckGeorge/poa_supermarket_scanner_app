@@ -7,10 +7,14 @@ import 'providers/branch_provider.dart';
 import 'screens/splash_screen.dart';
 import 'screens/login_screen.dart';
 import 'screens/main_screen.dart';
+import 'services/storage_service.dart';
 import 'utils/app_theme.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+
+  // Initialize storage service
+  await StorageService.init();
 
   // Request camera permission on app start
   await Permission.camera.request();

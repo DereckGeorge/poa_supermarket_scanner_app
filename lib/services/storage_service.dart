@@ -6,6 +6,12 @@ import '../models/user.dart';
 class StorageService {
   static const FlutterSecureStorage _secureStorage = FlutterSecureStorage();
   static SharedPreferences? _prefs;
+  static const String _tokenKey = 'auth_token';
+  static const String _tokenExpiryKey = 'token_expiry';
+  static const String _userDataKey = 'user_data';
+
+  // Token expires in 30 minutes
+  static const int tokenExpiryMinutes = 30;
 
   static Future<void> init() async {
     _prefs = await SharedPreferences.getInstance();
@@ -66,6 +72,74 @@ class StorageService {
 
   static Future<String?> getSelectedBranchId() async {
     return _prefs?.getString('selected_branch_id');
+  }
+
+  // Save authentication data
+  static Future<void> saveAuthData(
+    String token,
+    Map<String, dynamic> userData,
+  ) async {
+    final prefs = await SharedPreferences.getInstance();
+    final expiryTime = DateTime.now().add(
+      Duration(minutes: tokenExpiryMinutes),
+    );
+
+    await prefs.setString(_tokenKey, token);
+    await prefs.setString(_tokenExpiryKey, expiryTime.toIso8601String());
+    await prefs.setString(_userDataKey, userData.toString());
+  }
+
+  // Get stored token if not expired
+  static Future<String?> getValidToken() async {
+    final prefs = await SharedPreferences.getInstance();
+    final token = prefs.getString(_tokenKey);
+    final expiryString = prefs.getString(_tokenExpiryKey);
+
+    if (token == null || expiryString == null) {
+      return null;
+    }
+
+    final expiryTime = DateTime.parse(expiryString);
+    if (DateTime.now().isAfter(expiryTime)) {
+      // Token expired, clear storage
+      await clearAuthData();
+      return null;
+    }
+
+    return token;
+  }
+
+  // Check if user is logged in and token is valid
+  static Future<bool> isLoggedIn() async {
+    final token = await getValidToken();
+    return token != null;
+  }
+
+  // Clear all authentication data
+  static Future<void> clearAuthData() async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.remove(_tokenKey);
+    await prefs.remove(_tokenExpiryKey);
+    await prefs.remove(_userDataKey);
+  }
+
+  // Get stored user data
+  static Future<String?> getUserData() async {
+    final prefs = await SharedPreferences.getInstance();
+    return prefs.getString(_userDataKey);
+  }
+
+  // Update token expiry (refresh the 30-minute timer)
+  static Future<void> refreshTokenExpiry() async {
+    final prefs = await SharedPreferences.getInstance();
+    final token = prefs.getString(_tokenKey);
+
+    if (token != null) {
+      final newExpiryTime = DateTime.now().add(
+        Duration(minutes: tokenExpiryMinutes),
+      );
+      await prefs.setString(_tokenExpiryKey, newExpiryTime.toIso8601String());
+    }
   }
 
   // Clear all data

@@ -6,9 +6,12 @@ import '../providers/branch_provider.dart';
 import '../utils/app_theme.dart';
 import '../widgets/stats_card.dart';
 import '../widgets/quick_action_card.dart';
+import '../widgets/add_product_form.dart';
 
 class HomeScreen extends StatefulWidget {
-  const HomeScreen({super.key});
+  final Function(int)? onTabChange;
+
+  const HomeScreen({super.key, this.onTabChange});
 
   @override
   State<HomeScreen> createState() => _HomeScreenState();
@@ -19,6 +22,16 @@ class _HomeScreenState extends State<HomeScreen> {
   void initState() {
     super.initState();
     _loadData();
+  }
+
+  String _formatCurrency(double value) {
+    if (value >= 1000000) {
+      return 'Tsh ${(value / 1000000).toStringAsFixed(1)}M';
+    } else if (value >= 1000) {
+      return 'Tsh ${(value / 1000).toStringAsFixed(1)}K';
+    } else {
+      return 'Tsh ${value.toStringAsFixed(0)}';
+    }
   }
 
   Future<void> _loadData() async {
@@ -51,7 +64,9 @@ class _HomeScreenState extends State<HomeScreen> {
                 builder: (context, authProvider, child) {
                   return Container(
                     width: double.infinity,
-                    padding: const EdgeInsets.all(20),
+                    padding: EdgeInsets.all(
+                      MediaQuery.of(context).size.width > 600 ? 24 : 20,
+                    ),
                     decoration: BoxDecoration(
                       gradient: LinearGradient(
                         begin: Alignment.topLeft,
@@ -68,7 +83,11 @@ class _HomeScreenState extends State<HomeScreen> {
                           style: Theme.of(context).textTheme.titleMedium
                               ?.copyWith(color: AppTheme.white),
                         ),
-                        const SizedBox(height: 4),
+                        SizedBox(
+                          height: MediaQuery.of(context).size.width > 600
+                              ? 6
+                              : 4,
+                        ),
                         Text(
                           authProvider.user?.name ?? 'User',
                           style: Theme.of(context).textTheme.headlineSmall
@@ -77,7 +96,11 @@ class _HomeScreenState extends State<HomeScreen> {
                                 fontWeight: FontWeight.bold,
                               ),
                         ),
-                        const SizedBox(height: 16),
+                        SizedBox(
+                          height: MediaQuery.of(context).size.width > 600
+                              ? 20
+                              : 16,
+                        ),
                         Consumer<BranchProvider>(
                           builder: (context, branchProvider, child) {
                             final branch = branchProvider.selectedBranch;
@@ -89,10 +112,15 @@ class _HomeScreenState extends State<HomeScreen> {
                                   size: 16,
                                 ),
                                 const SizedBox(width: 8),
-                                Text(
-                                  branch?.name ?? 'No Branch Selected',
-                                  style: Theme.of(context).textTheme.bodyMedium
-                                      ?.copyWith(color: AppTheme.white),
+                                Flexible(
+                                  child: Text(
+                                    branch?.name ?? 'No Branch Selected',
+                                    style: Theme.of(context)
+                                        .textTheme
+                                        .bodyMedium
+                                        ?.copyWith(color: AppTheme.white),
+                                    overflow: TextOverflow.ellipsis,
+                                  ),
                                 ),
                               ],
                             );
@@ -124,8 +152,8 @@ class _HomeScreenState extends State<HomeScreen> {
                       subtitle: 'Scan barcode to view or add products',
                       color: AppTheme.primaryRed,
                       onTap: () {
-                        // Navigate to scanner
-                        DefaultTabController.of(context)?.animateTo(1);
+                        // Navigate to scanner tab
+                        widget.onTabChange?.call(1);
                       },
                     ),
                   ),
@@ -137,7 +165,16 @@ class _HomeScreenState extends State<HomeScreen> {
                       subtitle: 'Manually add new product',
                       color: Colors.green,
                       onTap: () {
-                        // Navigate to add product
+                        // Show add product form
+                        showModalBottomSheet(
+                          context: context,
+                          isScrollControlled: true,
+                          backgroundColor: Colors.transparent,
+                          builder: (context) => const AddProductForm(
+                            scannedCode: null,
+                            existingProduct: null,
+                          ),
+                        );
                       },
                     ),
                   ),
@@ -168,53 +205,117 @@ class _HomeScreenState extends State<HomeScreen> {
 
                   return Column(
                     children: [
-                      Row(
-                        children: [
-                          Expanded(
-                            child: StatsCard(
-                              title: 'Total Products',
-                              value: stats.totalProducts.toString(),
-                              subtitle: 'Items in inventory',
-                              icon: Icons.inventory,
-                              color: Colors.blue,
-                            ),
-                          ),
-                          const SizedBox(width: 16),
-                          Expanded(
-                            child: StatsCard(
-                              title: 'Low Stock',
-                              value: stats.lowStockProducts.toString(),
-                              subtitle: 'Need restocking',
-                              icon: Icons.warning,
-                              color: Colors.orange,
-                            ),
-                          ),
-                        ],
-                      ),
-                      const SizedBox(height: 16),
-                      Row(
-                        children: [
-                          Expanded(
-                            child: StatsCard(
-                              title: 'Out of Stock',
-                              value: stats.outOfStockProducts.toString(),
-                              subtitle: 'Unavailable items',
-                              icon: Icons.error,
-                              color: Colors.red,
-                            ),
-                          ),
-                          const SizedBox(width: 16),
-                          Expanded(
-                            child: StatsCard(
-                              title: 'Inventory Value',
-                              value:
-                                  'KSh ${stats.inventoryValue.toStringAsFixed(0)}',
-                              subtitle: 'Total worth',
-                              icon: Icons.monetization_on,
-                              color: Colors.green,
-                            ),
-                          ),
-                        ],
+                      // First row of stats
+                      LayoutBuilder(
+                        builder: (context, constraints) {
+                          final isWide = constraints.maxWidth > 600;
+
+                          if (isWide) {
+                            // Wide screen: show all 4 cards in one row
+                            return Row(
+                              children: [
+                                Expanded(
+                                  child: StatsCard(
+                                    title: 'Total Products',
+                                    value: stats.totalProducts.toString(),
+                                    subtitle: 'Items in inventory',
+                                    icon: Icons.inventory,
+                                    color: Colors.blue,
+                                  ),
+                                ),
+                                const SizedBox(width: 16),
+                                Expanded(
+                                  child: StatsCard(
+                                    title: 'Low Stock',
+                                    value: stats.lowStockProducts.toString(),
+                                    subtitle: 'Need restocking',
+                                    icon: Icons.warning,
+                                    color: Colors.orange,
+                                  ),
+                                ),
+                                const SizedBox(width: 16),
+                                Expanded(
+                                  child: StatsCard(
+                                    title: 'Out of Stock',
+                                    value: stats.outOfStockProducts.toString(),
+                                    subtitle: 'Unavailable items',
+                                    icon: Icons.error,
+                                    color: Colors.red,
+                                  ),
+                                ),
+                                const SizedBox(width: 16),
+                                Expanded(
+                                  child: StatsCard(
+                                    title: 'Inventory Value',
+                                    value: _formatCurrency(
+                                      stats.inventoryValue,
+                                    ),
+                                    subtitle: 'Total worth',
+                                    icon: Icons.monetization_on,
+                                    color: Colors.green,
+                                  ),
+                                ),
+                              ],
+                            );
+                          } else {
+                            // Normal screen: show 2x2 grid
+                            return Column(
+                              children: [
+                                Row(
+                                  children: [
+                                    Expanded(
+                                      child: StatsCard(
+                                        title: 'Total Products',
+                                        value: stats.totalProducts.toString(),
+                                        subtitle: 'Items in inventory',
+                                        icon: Icons.inventory,
+                                        color: Colors.blue,
+                                      ),
+                                    ),
+                                    const SizedBox(width: 16),
+                                    Expanded(
+                                      child: StatsCard(
+                                        title: 'Low Stock',
+                                        value: stats.lowStockProducts
+                                            .toString(),
+                                        subtitle: 'Need restocking',
+                                        icon: Icons.warning,
+                                        color: Colors.orange,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                                const SizedBox(height: 16),
+                                Row(
+                                  children: [
+                                    Expanded(
+                                      child: StatsCard(
+                                        title: 'Out of Stock',
+                                        value: stats.outOfStockProducts
+                                            .toString(),
+                                        subtitle: 'Unavailable items',
+                                        icon: Icons.error,
+                                        color: Colors.red,
+                                      ),
+                                    ),
+                                    const SizedBox(width: 16),
+                                    Expanded(
+                                      child: StatsCard(
+                                        title: 'Inventory Value',
+                                        value: _formatCurrency(
+                                          stats.inventoryValue,
+                                        ),
+                                        subtitle: 'Total worth',
+                                        icon: Icons.monetization_on,
+                                        color: Colors.green,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ],
+                            );
+                          }
+                        },
                       ),
                     ],
                   );

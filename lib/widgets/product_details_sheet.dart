@@ -59,7 +59,7 @@ class ProductDetailsSheet extends StatelessWidget {
                     borderRadius: BorderRadius.circular(16),
                   ),
                   child: Text(
-                    'Code: ${product.code}',
+                    'Code: ${product.code ?? 'N/A'}',
                     style: Theme.of(context).textTheme.bodySmall,
                   ),
                 ),
@@ -71,7 +71,7 @@ class ProductDetailsSheet extends StatelessWidget {
                     Expanded(
                       child: _InfoCard(
                         title: 'Price',
-                        value: 'UGX ${product.price.toStringAsFixed(0)}',
+                        value: 'Tsh ${product.price.toStringAsFixed(0)}',
                         icon: Icons.attach_money,
                         color: Colors.green,
                       ),
@@ -80,7 +80,7 @@ class ProductDetailsSheet extends StatelessWidget {
                     Expanded(
                       child: _InfoCard(
                         title: 'Stock',
-                        value: '${product.quantity} ${product.unit}',
+                        value: '${product.quantity} ${product.unit ?? 'units'}',
                         icon: Icons.inventory,
                         color: product.isLowStock ? Colors.red : Colors.blue,
                       ),
@@ -95,7 +95,7 @@ class ProductDetailsSheet extends StatelessWidget {
                     Expanded(
                       child: _InfoCard(
                         title: 'Category',
-                        value: product.category,
+                        value: product.category ?? 'Unknown',
                         icon: Icons.category,
                         color: Colors.purple,
                       ),
@@ -195,7 +195,7 @@ class ProductDetailsSheet extends StatelessWidget {
                             ),
                             if (product.isLowStock && !product.isOutOfStock)
                               Text(
-                                'Reorder level: ${product.reorderLevel} ${product.unit}',
+                                'Reorder level: ${product.reorderLevel} ${product.unit ?? 'units'}',
                                 style: Theme.of(context).textTheme.bodySmall,
                               ),
                           ],

@@ -37,7 +37,7 @@ class ProductCard extends StatelessWidget {
                         ),
                         const SizedBox(height: 4),
                         Text(
-                          'Code: ${product.code}',
+                          'Code: ${product.code ?? 'N/A'}',
                           style: Theme.of(context).textTheme.bodySmall
                               ?.copyWith(color: AppTheme.textGrey),
                         ),
@@ -52,7 +52,7 @@ class ProductCard extends StatelessWidget {
                             borderRadius: BorderRadius.circular(12),
                           ),
                           child: Text(
-                            product.category,
+                            product.category ?? 'Unknown',
                             style: Theme.of(context).textTheme.bodySmall
                                 ?.copyWith(
                                   color: AppTheme.primaryRed,
@@ -69,16 +69,16 @@ class ProductCard extends StatelessWidget {
                     crossAxisAlignment: CrossAxisAlignment.end,
                     children: [
                       Text(
-                        'UGX ${product.price.toStringAsFixed(0)}',
+                        'Tsh ${product.price.toStringAsFixed(0)}',
                         style: Theme.of(context).textTheme.titleLarge?.copyWith(
                           fontWeight: FontWeight.bold,
                           color: AppTheme.primaryRed,
                         ),
                       ),
-                      if (product.profit > 0) ...[
+                      if (product.profit != null && product.profit! > 0) ...[
                         const SizedBox(height: 4),
                         Text(
-                          'Profit: UGX ${product.profit.toStringAsFixed(0)}',
+                          'Profit: Tsh ${product.profit!.toStringAsFixed(0)}',
                           style: Theme.of(context).textTheme.bodySmall
                               ?.copyWith(
                                 color: Colors.green,
@@ -103,7 +103,7 @@ class ProductCard extends StatelessWidget {
                   ),
                   const SizedBox(width: 6),
                   Text(
-                    '${product.quantity} ${product.unit}',
+                    '${product.quantity} ${product.unit ?? 'units'}',
                     style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                       fontWeight: FontWeight.w500,
                       color: product.isLowStock ? Colors.red : Colors.blue,

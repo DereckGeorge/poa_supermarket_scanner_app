@@ -3,73 +3,81 @@ import 'user.dart';
 class Product {
   final String id;
   final String name;
-  final String code;
+  final String? code;
   final String? description;
   final double price;
   final double costPrice;
   final int quantity;
   final bool isLoan;
   final int reorderLevel;
-  final String unit;
-  final String category;
+  final String? unit;
+  final String? category;
   final String branchId;
   final User? createdBy;
   final User? updatedBy;
   final DateTime createdAt;
   final DateTime updatedAt;
   final DateTime? deletedAt;
-  final double profit;
+  final double? profit;
   final Branch? branch;
 
   Product({
     required this.id,
     required this.name,
-    required this.code,
+    this.code,
     this.description,
     required this.price,
     required this.costPrice,
     required this.quantity,
     required this.isLoan,
     required this.reorderLevel,
-    required this.unit,
-    required this.category,
+    this.unit,
+    this.category,
     required this.branchId,
     this.createdBy,
     this.updatedBy,
     required this.createdAt,
     required this.updatedAt,
     this.deletedAt,
-    required this.profit,
+    this.profit,
     this.branch,
   });
 
   factory Product.fromJson(Map<String, dynamic> json) {
     return Product(
-      id: json['id'],
-      name: json['name'],
-      code: json['code'],
-      description: json['description'],
-      price: double.parse(json['price'].toString()),
-      costPrice: double.parse(json['cost_price'].toString()),
-      quantity: json['quantity'],
-      isLoan: json['is_loan'],
-      reorderLevel: json['reorder_level'],
-      unit: json['unit'],
-      category: json['category'],
-      branchId: json['branch_id'],
-      createdBy: json['created_by'] != null
+      id: json['id']?.toString() ?? '',
+      name: json['name']?.toString() ?? '',
+      code: json['code']?.toString(),
+      description: json['description']?.toString(),
+      price: double.tryParse(json['price']?.toString() ?? '0') ?? 0.0,
+      costPrice: double.tryParse(json['cost_price']?.toString() ?? '0') ?? 0.0,
+      quantity: int.tryParse(json['quantity']?.toString() ?? '0') ?? 0,
+      isLoan: json['is_loan'] == true || json['is_loan'] == 1,
+      reorderLevel: int.tryParse(json['reorder_level']?.toString() ?? '0') ?? 0,
+      unit: json['unit']?.toString(),
+      category: json['category']?.toString(),
+      branchId: json['branch_id']?.toString() ?? '',
+      createdBy: json['created_by'] != null && json['created_by'] is Map
           ? User.fromJson(json['created_by'])
           : null,
-      updatedBy: json['updated_by'] != null
+      updatedBy: json['updated_by'] != null && json['updated_by'] is Map
           ? User.fromJson(json['updated_by'])
           : null,
-      createdAt: DateTime.parse(json['created_at']),
-      updatedAt: DateTime.parse(json['updated_at']),
+      createdAt: json['created_at'] != null
+          ? DateTime.tryParse(json['created_at'].toString()) ?? DateTime.now()
+          : DateTime.now(),
+      updatedAt: json['updated_at'] != null
+          ? DateTime.tryParse(json['updated_at'].toString()) ?? DateTime.now()
+          : DateTime.now(),
       deletedAt: json['deleted_at'] != null
-          ? DateTime.parse(json['deleted_at'])
+          ? DateTime.tryParse(json['deleted_at'].toString())
           : null,
-      profit: json['profit'].toDouble(),
-      branch: json['branch'] != null ? Branch.fromJson(json['branch']) : null,
+      profit: json['profit'] != null
+          ? double.tryParse(json['profit'].toString())
+          : null,
+      branch: json['branch'] != null && json['branch'] is Map
+          ? Branch.fromJson(json['branch'])
+          : null,
     );
   }
 
@@ -128,16 +136,20 @@ class ProductStatistics {
 
   factory ProductStatistics.fromJson(Map<String, dynamic> json) {
     return ProductStatistics(
-      totalProducts: json['total_products'],
-      outOfStockProducts: json['out_of_stock_products'],
-      lowStockProducts: json['low_stock_products'],
-      inventoryValue: json['inventory_value'].toDouble(),
-      totalBuyingCost: json['total_buying_cost'].toDouble(),
-      totalProfitPotential: json['total_profit_potential'].toDouble(),
-      expiredProducts: json['expired_products'],
-      expiringInWeek: json['expiring_in_week'],
-      expiringInMonth: json['expiring_in_month'],
-      expiringIn3Months: json['expiring_in_3_months'],
+      totalProducts: json['total_products'] ?? 0,
+      outOfStockProducts: json['out_of_stock_products'] ?? 0,
+      lowStockProducts: json['low_stock_products'] ?? 0,
+      inventoryValue:
+          double.tryParse(json['inventory_value']?.toString() ?? '0') ?? 0.0,
+      totalBuyingCost:
+          double.tryParse(json['total_buying_cost']?.toString() ?? '0') ?? 0.0,
+      totalProfitPotential:
+          double.tryParse(json['total_profit_potential']?.toString() ?? '0') ??
+          0.0,
+      expiredProducts: json['expired_products'] ?? 0,
+      expiringInWeek: json['expiring_in_week'] ?? 0,
+      expiringInMonth: json['expiring_in_month'] ?? 0,
+      expiringIn3Months: json['expiring_in_3_months'] ?? 0,
     );
   }
 }

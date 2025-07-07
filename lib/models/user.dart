@@ -25,17 +25,23 @@ class User {
 
   factory User.fromJson(Map<String, dynamic> json) {
     return User(
-      id: json['id'],
-      name: json['name'],
-      email: json['email'],
-      position: json['position'],
-      status: json['status'],
-      createdAt: DateTime.parse(json['created_at']),
-      updatedAt: DateTime.parse(json['updated_at']),
-      branch: json['branch'] != null ? Branch.fromJson(json['branch']) : null,
-      approvedBy: json['approved_by'],
+      id: json['id']?.toString() ?? '',
+      name: json['name']?.toString() ?? '',
+      email: json['email']?.toString() ?? '',
+      position: json['position']?.toString() ?? '',
+      status: json['status']?.toString() ?? '',
+      createdAt: json['created_at'] != null
+          ? DateTime.tryParse(json['created_at'].toString()) ?? DateTime.now()
+          : DateTime.now(),
+      updatedAt: json['updated_at'] != null
+          ? DateTime.tryParse(json['updated_at'].toString()) ?? DateTime.now()
+          : DateTime.now(),
+      branch: json['branch'] != null && json['branch'] is Map
+          ? Branch.fromJson(json['branch'])
+          : null,
+      approvedBy: json['approved_by']?.toString(),
       approvedAt: json['approved_at'] != null
-          ? DateTime.parse(json['approved_at'])
+          ? DateTime.tryParse(json['approved_at'].toString())
           : null,
     );
   }
@@ -62,8 +68,8 @@ class Branch {
   final String location;
   final String contactNumber;
   final bool isActive;
-  final DateTime createdAt;
-  final DateTime updatedAt;
+  final DateTime? createdAt;
+  final DateTime? updatedAt;
 
   Branch({
     required this.id,
@@ -71,19 +77,23 @@ class Branch {
     required this.location,
     required this.contactNumber,
     required this.isActive,
-    required this.createdAt,
-    required this.updatedAt,
+    this.createdAt,
+    this.updatedAt,
   });
 
   factory Branch.fromJson(Map<String, dynamic> json) {
     return Branch(
-      id: json['id'],
-      name: json['name'],
-      location: json['location'],
-      contactNumber: json['contact_number'],
-      isActive: json['is_active'],
-      createdAt: DateTime.parse(json['created_at']),
-      updatedAt: DateTime.parse(json['updated_at']),
+      id: json['id']?.toString() ?? '',
+      name: json['name']?.toString() ?? '',
+      location: json['location']?.toString() ?? '',
+      contactNumber: json['contact_number']?.toString() ?? '',
+      isActive: json['is_active'] == true || json['is_active'] == 1,
+      createdAt: json['created_at'] != null
+          ? DateTime.tryParse(json['created_at'].toString())
+          : null,
+      updatedAt: json['updated_at'] != null
+          ? DateTime.tryParse(json['updated_at'].toString())
+          : null,
     );
   }
 
@@ -94,8 +104,8 @@ class Branch {
       'location': location,
       'contact_number': contactNumber,
       'is_active': isActive,
-      'created_at': createdAt.toIso8601String(),
-      'updated_at': updatedAt.toIso8601String(),
+      'created_at': createdAt?.toIso8601String(),
+      'updated_at': updatedAt?.toIso8601String(),
     };
   }
 }

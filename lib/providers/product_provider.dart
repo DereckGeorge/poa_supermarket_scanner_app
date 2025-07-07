@@ -95,6 +95,12 @@ class ProductProvider with ChangeNotifier {
 
   // Get unique categories
   List<String> get categories {
-    return _products.map((p) => p.category).toSet().toList()..sort();
+    return _products
+        .map((p) => p.category)
+        .where((category) => category != null)
+        .cast<String>()
+        .toSet()
+        .toList()
+      ..sort();
   }
 }

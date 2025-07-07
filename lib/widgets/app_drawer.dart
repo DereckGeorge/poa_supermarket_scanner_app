@@ -5,7 +5,9 @@ import '../providers/branch_provider.dart';
 import '../utils/app_theme.dart';
 
 class AppDrawer extends StatelessWidget {
-  const AppDrawer({super.key});
+  final Function(int)? onTabChange;
+
+  const AppDrawer({super.key, this.onTabChange});
 
   @override
   Widget build(BuildContext context) {
@@ -118,6 +120,15 @@ class AppDrawer extends StatelessWidget {
               children: [
                 _buildDrawerItem(
                   context,
+                  icon: Icons.home,
+                  title: 'Home',
+                  onTap: () {
+                    Navigator.pop(context);
+                    onTabChange?.call(0); // Navigate to home tab
+                  },
+                ),
+                _buildDrawerItem(
+                  context,
                   icon: Icons.account_circle_outlined,
                   title: 'Profile',
                   onTap: () {
@@ -131,7 +142,7 @@ class AppDrawer extends StatelessWidget {
                   title: 'Scan Product',
                   onTap: () {
                     Navigator.pop(context);
-                    // Navigate to scan tab
+                    onTabChange?.call(1); // Navigate to scan tab
                   },
                 ),
                 _buildDrawerItem(
@@ -140,6 +151,7 @@ class AppDrawer extends StatelessWidget {
                   title: 'Products',
                   onTap: () {
                     Navigator.pop(context);
+                    onTabChange?.call(2); // Navigate to products tab
                   },
                 ),
                 _buildDrawerItem(
@@ -148,6 +160,7 @@ class AppDrawer extends StatelessWidget {
                   title: 'Branches',
                   onTap: () {
                     Navigator.pop(context);
+                    onTabChange?.call(3); // Navigate to branches tab
                   },
                 ),
                 _buildDrawerItem(

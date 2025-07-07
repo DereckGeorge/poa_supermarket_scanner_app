@@ -202,38 +202,38 @@ class _LoginScreenState extends State<LoginScreen> {
               const SizedBox(height: 40),
 
               // Demo credentials hint
-              Container(
-                padding: const EdgeInsets.all(16),
-                decoration: BoxDecoration(
-                  color: AppTheme.grey,
-                  borderRadius: BorderRadius.circular(8),
-                ),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      'Demo Credentials:',
-                      style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                        color: AppTheme.primaryRed,
-                        fontWeight: FontWeight.w600,
-                      ),
-                    ),
-                    const SizedBox(height: 8),
-                    Text(
-                      'Email: super.admin@poanamanga.com',
-                      style: Theme.of(
-                        context,
-                      ).textTheme.bodySmall?.copyWith(color: AppTheme.textGrey),
-                    ),
-                    Text(
-                      'Password: SuperAdmin@123',
-                      style: Theme.of(
-                        context,
-                      ).textTheme.bodySmall?.copyWith(color: AppTheme.textGrey),
-                    ),
-                  ],
-                ),
-              ),
+              // Container(
+              //   padding: const EdgeInsets.all(16),
+              //   decoration: BoxDecoration(
+              //     color: AppTheme.grey,
+              //     borderRadius: BorderRadius.circular(8),
+              //   ),
+              //   child: Column(
+              //     crossAxisAlignment: CrossAxisAlignment.start,
+              //     children: [
+              //       Text(
+              //         'Demo Credentials:',
+              //         style: Theme.of(context).textTheme.titleMedium?.copyWith(
+              //           color: AppTheme.primaryRed,
+              //           fontWeight: FontWeight.w600,
+              //         ),
+              //       ),
+              //       const SizedBox(height: 8),
+              //       Text(
+              //         'Email: super.admin@poanamanga.com',
+              //         style: Theme.of(
+              //           context,
+              //         ).textTheme.bodySmall?.copyWith(color: AppTheme.textGrey),
+              //       ),
+              //       Text(
+              //         'Password: SuperAdmin@123',
+              //         style: Theme.of(
+              //           context,
+              //         ).textTheme.bodySmall?.copyWith(color: AppTheme.textGrey),
+              //       ),
+              //     ],
+              //   ),
+              // ),
             ],
           ),
         ),

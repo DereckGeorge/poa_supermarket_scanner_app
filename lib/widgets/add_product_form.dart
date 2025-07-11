@@ -37,6 +37,16 @@ class _AddProductFormState extends State<AddProductForm> {
   final _supplierEmailController = TextEditingController();
   final _supplierAddressController = TextEditingController();
 
+  // Tax code options
+  String? _selectedTaxCode;
+  final Map<String, String> _taxCodes = {
+    'A': 'Standard Rate (18%)',
+    'B': 'Special Rate (0%)',
+    'C': 'Zero rated for Non-VAT items (0%)',
+    'D': 'Special Relief (0%)',
+    'E': 'Exempt (0%)',
+  };
+
   bool _isLoading = false;
   bool get _isRestocking => widget.existingProduct != null;
   Branch? _selectedBranch;
@@ -74,6 +84,7 @@ class _AddProductFormState extends State<AddProductForm> {
       _reorderLevelController.text = product.reorderLevel.toString();
       _unitController.text = product.unit ?? '';
       _categoryController.text = product.category ?? '';
+      _selectedTaxCode = product.taxCode; // Pre-fill tax code for restocking
     }
   }
 
@@ -130,6 +141,7 @@ class _AddProductFormState extends State<AddProductForm> {
           expiryDate: expiryDate,
           loanAmount: loanAmount,
           loanPaid: loanPaid,
+          taxCode: _selectedTaxCode,
         );
       } else {
         // For new product - send all product details
@@ -158,6 +170,7 @@ class _AddProductFormState extends State<AddProductForm> {
           expiryDate: expiryDate,
           loanAmount: loanAmount,
           loanPaid: loanPaid,
+          taxCode: _selectedTaxCode,
         );
       }
 
@@ -472,6 +485,35 @@ class _AddProductFormState extends State<AddProductForm> {
                           ),
                         ),
                       ],
+                    ),
+                    const SizedBox(height: 16),
+
+                    // Tax Code Selection
+                    DropdownButtonFormField<String>(
+                      value: _selectedTaxCode,
+                      decoration: const InputDecoration(
+                        labelText: 'Tax Code *',
+                        border: OutlineInputBorder(),
+                        helperText:
+                            'Select applicable tax rate for this product',
+                      ),
+                      validator: (value) {
+                        if (value == null || value.isEmpty) {
+                          return 'Please select a tax code';
+                        }
+                        return null;
+                      },
+                      items: _taxCodes.entries.map((entry) {
+                        return DropdownMenuItem<String>(
+                          value: entry.key,
+                          child: Text('${entry.key} - ${entry.value}'),
+                        );
+                      }).toList(),
+                      onChanged: (String? newValue) {
+                        setState(() {
+                          _selectedTaxCode = newValue;
+                        });
+                      },
                     ),
                     const SizedBox(height: 16),
 

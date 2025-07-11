@@ -20,6 +20,7 @@ class Product {
   final DateTime? deletedAt;
   final double? profit;
   final Branch? branch;
+  final String? taxCode; // Tax code for the product
 
   Product({
     required this.id,
@@ -41,6 +42,7 @@ class Product {
     this.deletedAt,
     this.profit,
     this.branch,
+    this.taxCode,
   });
 
   factory Product.fromJson(Map<String, dynamic> json) {
@@ -78,6 +80,7 @@ class Product {
       branch: json['branch'] != null && json['branch'] is Map
           ? Branch.fromJson(json['branch'])
           : null,
+      taxCode: json['tax_code']?.toString(),
     );
   }
 
@@ -102,6 +105,7 @@ class Product {
       'deleted_at': deletedAt?.toIso8601String(),
       'profit': profit,
       'branch': branch?.toJson(),
+      'tax_code': taxCode,
     };
   }
 

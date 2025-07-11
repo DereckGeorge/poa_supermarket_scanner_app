@@ -61,6 +61,7 @@ class BatchItem {
   final DateTime? expiryDate;
   final double? loanAmount;
   final double? loanPaid;
+  final String? taxCode; // Tax code for the product
 
   BatchItem({
     this.productId,
@@ -76,6 +77,7 @@ class BatchItem {
     this.expiryDate,
     this.loanAmount,
     this.loanPaid,
+    this.taxCode,
   });
 
   factory BatchItem.fromJson(Map<String, dynamic> json) {
@@ -95,6 +97,7 @@ class BatchItem {
           : null,
       loanAmount: json['loan_amount']?.toDouble(),
       loanPaid: json['loan_paid']?.toDouble(),
+      taxCode: json['tax_code'],
     );
   }
 
@@ -124,6 +127,9 @@ class BatchItem {
     }
     if (loanPaid != null) {
       data['loan_paid'] = loanPaid;
+    }
+    if (taxCode != null) {
+      data['tax_code'] = taxCode;
     }
 
     return data;
